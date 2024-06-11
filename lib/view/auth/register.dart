@@ -18,14 +18,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final RxBool showPassword = false.obs;
   final AuthController authController = Get.find<AuthController>();
   final _loginOrRegisterController = Get.find<LoginOrRegisterController>();
-  final _loginFormKey = GlobalKey<FormState>();
+  final _registerFormKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    _loginFormKey.currentState?.dispose();
+    _registerFormKey.currentState?.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -34,10 +34,15 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void onRegister() {
-    if (_loginFormKey.currentState!.validate()) {
+    if (_registerFormKey.currentState!.validate()) {
+      GetUtils.printFunction("Validated", 'RegisterPage', 'onRegister');
+      try {
+        authController.registerWithEmailAndPassword(emailController.text, passwordController.text);
+      }
       // authController.login();
-      print("login pressed");
-    }
+      catch (error) {
+        // TODO: Implement error alert dialog if something goes wrong
+      }}
   }
 
   void onLoginPressed() {
@@ -71,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: Form(
-            key: _loginFormKey,
+            key: _registerFormKey,
             child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: [
                         Expanded(
                             child: ElevatedButton(
-                              onPressed: onLoginPressed,
+                              onPressed: onRegister,
                               style: getElevatedButtonStyle(),
                               child: Padding(
                                 padding: getLRTBPadding(),

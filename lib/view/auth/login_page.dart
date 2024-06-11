@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stemmchat/utils/constants.dart';
@@ -30,10 +31,18 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void onLogin() {
+  void onLogin() async {
     if (_loginFormKey.currentState!.validate()) {
-      // authController.login();
-      print("login pressed");
+      GetUtils.printFunction("login pressed","LoginPage","onLogin");
+      try {
+         await authController.signInWithEmailAndPassword(
+            emailController.text, passwordController.text);
+         GetUtils.printFunction("login pressed","LoginPage","onLoginComplete");
+      } on FirebaseAuthException catch (e) {
+        // TODO: Implement error alert dialog if something goes wrong
+        Get.defaultDialog(title: "ERROR", middleText: e.toString());
+      }
+
     }
   }
 
@@ -45,12 +54,7 @@ class _LoginPageState extends State<LoginPage> {
     showPassword.value = !showPassword.value;
   }
 
-  String? fieldValidator(String? text) {
-    if (text == null || text.isEmpty) {
-      return "Field can't be empty";
-    }
-    return null;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,14 +71,14 @@ class _LoginPageState extends State<LoginPage> {
                     padding: getLRTBPadding(),
                     child: Text(
                       "STEMMChat",
-                      style:getTextStyle(fs: 30, fw: FontWeight.bold),
+                      style: getTextStyle(fs: 30, fw: FontWeight.bold),
                     ),
                   ),
                   Padding(
                     padding: getLRTBPadding(),
                     child: Text(
                       "Welcome Back,\nLogin to your account",
-                      style:getTextStyle(fs: 22, fw: FontWeight.bold),
+                      style: getTextStyle(fs: 22, fw: FontWeight.bold),
                     ),
                   ),
                   Padding(
@@ -91,8 +95,8 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: getLRTBPadding(),
                     child: Obx(
-                          () => TextFormField(
-                            controller: passwordController,
+                      () => TextFormField(
+                        controller: passwordController,
                         obscureText: showPassword.value,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         decoration: getInputDecoration(
@@ -113,29 +117,34 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Expanded(
                             child: ElevatedButton(
-                              onPressed: onLogin,
-                              style: getElevatedButtonStyle(),
-                              child: Padding(
-                                padding: getLRTBPadding(),
-                                child: Text(
-                                  "Login",
-                                  style: getTextStyle(
-                                      fw: FontWeight.w600, fs: 24, fc: Colors.white),
-                                ),
-                              ),
-                            )),
+                          onPressed: onLogin,
+                          style: getElevatedButtonStyle(),
+                          child: Padding(
+                            padding: getLRTBPadding(),
+                            child: Text(
+                              "Login",
+                              style: getTextStyle(
+                                  fw: FontWeight.w600,
+                                  fs: 24,
+                                  fc: Colors.white),
+                            ),
+                          ),
+                        )),
                       ],
                     ),
                   ),
                   Padding(
                     padding: getLRTBPadding(),
-                    child:  Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Don't have an account?",style: getTextStyle()),
+                        Text("Don't have an account?", style: getTextStyle()),
                         InkWell(
-                          onTap: onRegisterPressed,
-                            child: Text("Register here" ,style: getTextStyle(fc: focusColor),)),
+                            onTap: onRegisterPressed,
+                            child: Text(
+                              "Register here",
+                              style: getTextStyle(fc: focusColor),
+                            )),
                       ],
                     ),
                   ),

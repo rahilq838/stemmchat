@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'constants.dart';
+import 'package:intl/intl.dart';
 
+String extractTime(int millisecondsSinceEpoch) {
+  // Convert millisecondsSinceEpoch to DateTime
+  final dateTime = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+
+  // Format the time in HH:MM AM/PM format
+  final formattedTime = DateFormat('hh:mm a').format(dateTime);
+
+  return formattedTime;
+}
+
+String formatDate(int millisecondsSinceEpoch) {
+  final dateTime = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+  final formatter = DateFormat('dd/MM/yyyy');
+  return formatter.format(dateTime);
+}
 bool isValidEmail(String email) {
   const pattern = r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$";
   final regExp = RegExp(pattern);
@@ -20,6 +36,13 @@ String? emailValidator(String? text) {
   }
   if (!isValidEmail(text)) {
     return "Invalid Email";
+  }
+  return null;
+}
+
+String? fieldValidator(String? text) {
+  if (text == null || text.isEmpty) {
+    return "Field can't be empty";
   }
   return null;
 }
@@ -55,8 +78,8 @@ InputDecoration getInputDecoration({labelText, border, suffixIcon}) {
 
 EdgeInsets getLRTBPadding({left, right, top, bottom}) {
   return EdgeInsets.only(
-      left: left ?? 30,
-      right: right ?? 30,
+      left: left ?? 10,
+      right: right ?? 10,
       top: top ?? 10,
       bottom: bottom ?? 10);
 }

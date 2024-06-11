@@ -17,12 +17,12 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: StreamBuilder<User?>(
-      stream: _authController.user,
+      stream: _authController.userStream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return LoginOrRegister();
+          return HomePage();
         } else {
-          return const HomePage();
+          return  LoginOrRegister();
         }
       },
     ));
