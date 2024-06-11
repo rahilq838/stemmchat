@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "783341867869",
+    "project_id": "stemmchat-4996c",
+    "storage_bucket": "stemmchat-4996c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783341867869:android:0b75560e337e160be9ceb4",
+        "android_client_info": {
+          "package_name": "com.stemmchat.stemmchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC02oOmUHb2aW5m7lE0oDfy_UosoPbFtrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
