@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
 import 'package:stemmchat/model/stemm_user.dart';
 
-import '../model/message.dart';
+import '../model/chat_user.dart';
 
 class CurrentChatRoomController extends GetxController{
-  STEMMUser? currentReceiver;
+  ChatUser? currentReceiver;
 
 
-  void setCurrentReceiver(STEMMUser user){
+  void setCurrentReceiver(ChatUser user){
     currentReceiver = user;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,9 +10,11 @@ import 'route.dart' as app_route;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
-  await Permission.manageExternalStorage.request();
-  await Permission.photos.request();
-  await Permission.videos.request();
+  if(!kIsWeb){
+    await Permission.manageExternalStorage.request();
+    await Permission.photos.request();
+    await Permission.videos.request();
+  }
   runApp(const MyApp());
 }
 

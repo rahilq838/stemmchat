@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stemmchat/utils/constants.dart';
-
 import '../../controller/auth_controller.dart';
 import '../../controller/login_or_register_controller.dart';
-import '../../route.dart';
 import '../../utils/functions.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -42,6 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
       // authController.login();
       catch (error) {
         // TODO: Implement error alert dialog if something goes wrong
+        Get.defaultDialog(title: "Error", middleText: error.toString());
       }}
   }
 
@@ -91,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Padding(
                     padding: getLRTBPadding(),
                     child: Text(
-                      "Welcome Back,\nLogin to your account",
+                      "Lets,\nCreate an Account",
                       style:getTextStyle(fs: 22, fw: FontWeight.bold),
                     ),
                   ),

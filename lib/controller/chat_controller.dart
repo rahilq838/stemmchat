@@ -1,14 +1,9 @@
 import 'package:get/get.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:stemmchat/controller/auth_controller.dart';
-
 import '../model/message.dart';
 import 'current_chat_room_controller.dart';
 import 'firestore_controller.dart';
-
-
-
-
 
 class ChatController extends GetxController {
   int docLimit = 50;
@@ -24,18 +19,39 @@ class ChatController extends GetxController {
     isLoading.value = true;
     await getMessages(currentChatRoomController.currentReceiver!.uid);
     isLoading.value = false;
+    await markAsReadWhenChatPageOpens();
     super.onInit();
   }
 
-   String getCurrentChatRoom(String receiverID) {
+  markAsReadWhenChatPageOpens() async {
+    try {
+      if (authController.user != null) {
+        await fsInstance
+            .collection("chat_rooms")
+            .doc(getCurrentChatRoom(
+                currentChatRoomController.currentReceiver!.uid))
+            .collection("Messages")
+            .where("senderID",
+                isEqualTo: currentChatRoomController.currentReceiver!.uid)
+            .get()
+            .then((value) {
+          value.docs.map((e) => e.reference.update({"read": true}));
+        });
+      }
+    } catch (e) {
+      GetUtils.printFunction(e.toString(), "ChatController", "markAsRead",
+          isError: true);
+    }
+  }
+
+  String getCurrentChatRoom(String receiverID) {
     List<String> ids = [authController.user!.uid, receiverID];
     ids.sort();
     String currentChatRoom = ids.join("_");
     return currentChatRoom;
   }
 
-
-  Future<void> sendMessage(String receiverID,Message message) async {
+  Future<void> sendMessage(String receiverID, Message message) async {
     try {
       if (authController.user != null) {
         await fsInstance
@@ -59,17 +75,19 @@ class ChatController extends GetxController {
           .doc(getCurrentChatRoom(receiverID))
           .collection("Messages")
           .orderBy("timestamp", descending: true)
-      .limit(docLimit)
+          .limit(docLimit)
           .snapshots()
           .listen((event) {
-        GetUtils.printFunction("event.docs.length", event.docs.length, "getMessages");
+        GetUtils.printFunction(
+            "event.docs.length", event.docs.length, "getMessages");
         messages.value =
             event.docs.map((e) => Message.fromMap(e.data())).toList();
-        GetUtils.printFunction("messages.valueGET", messages.value.length, "getMessages");
+        GetUtils.printFunction(
+            "messages.valueGET", messages.value.length, "getMessages");
       });
-
-    }catch(e){
-      GetUtils.printFunction(e.toString(), "Message.fromMap(e.data())).toList()", "getMessages",
+    } catch (e) {
+      GetUtils.printFunction(
+          e.toString(), "Message.fromMap(e.data())).toList()", "getMessages",
           isError: true);
     }
   }

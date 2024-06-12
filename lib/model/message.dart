@@ -10,9 +10,12 @@ class Message {
   String type;
   String? downloadUrl;
   Timestamp timestamp;
+  bool read = false;
 
   Message(
-      {required this.senderID,
+      {
+        required this.read,
+        required this.senderID,
       required this.senderEmail,
       this.downloadUrl,
       required this.receiverID,
@@ -22,6 +25,7 @@ class Message {
 
   factory Message.fromMap(Map<String, dynamic> map) {
     return Message(
+        read: map['read'],
         senderID: map['senderID'],
         senderEmail: map['senderEmail'],
         receiverID: map['receiverID'],
@@ -33,6 +37,7 @@ class Message {
 
   Map<String, dynamic> toMap() {
     return {
+      'read': read,
       'senderID': senderID,
       'senderEmail': senderEmail,
       'receiverID': receiverID,
@@ -45,6 +50,6 @@ class Message {
 
   @override
   String toString() {
-    return 'Message{senderID: $senderID, senderEmail: $senderEmail, receiverID: $receiverID, body: $body, timestamp: $timestamp}';
+    return 'Message{senderID: $senderID, senderEmail: $senderEmail, receiverID: $receiverID, body: $body, timestamp: $timestamp, type: $type, downloadUrl: $downloadUrl, read: $read}';
   }
 }

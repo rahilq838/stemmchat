@@ -81,6 +81,7 @@ class FireBaseStorageController extends GetxController {
         chatController.sendMessage(
             chatRoomController.currentReceiver!.uid,
             Message(
+              read: false,
                 type: fileType,
                 senderID: chatController.authController.user!.uid,
                 senderEmail: chatController.authController.user!.email,

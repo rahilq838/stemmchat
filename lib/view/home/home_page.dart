@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stemmchat/controller/current_chat_room_controller.dart';
 import 'package:stemmchat/controller/firestore_controller.dart';
-import 'package:stemmchat/model/stemm_user.dart';
 import 'package:stemmchat/route.dart';
 import '../../controller/auth_controller.dart';
+import '../../controller/home_controller.dart';
+import '../../model/chat_user.dart';
 import '../../utils/functions.dart';
 
 class HomePage extends StatelessWidget {
@@ -17,16 +18,16 @@ class HomePage extends StatelessWidget {
 
   onSignOutPressed() {
     try {
-      GetUtils.printFunction("sign out pressed", "HomePage", "onSignOutPressed");
+      GetUtils.printFunction(
+          "sign out pressed", "HomePage", "onSignOutPressed");
       _authController.signOut();
-
     } catch (error) {
       // TODO: Implement error alert dialog if something goes wrong
       Get.defaultDialog(title: "ERROR", middleText: error.toString());
     }
   }
 
-  onReceiverTap(STEMMUser receiver) {
+  onReceiverTap(ChatUser receiver) {
     GetUtils.printFunction("onReceiverTap", "HomePage", "onReceiverTap");
     _currentChatRoomController.currentReceiver = receiver;
     Get.toNamed(chatPageRoute);
@@ -69,17 +70,21 @@ class HomePage extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Obx(
-                        ()=> ListView.builder(
+                        () => ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: fireStoreController.users.value.length,
                           itemBuilder: (context, index) {
                             return ListTile(
-                              onTap:(){
-                                onReceiverTap(fireStoreController
-                                    .users.value[index]);},
-
-                                title: Text(fireStoreController
-                                    .users.value[index].email));
+                              onTap: () {
+                                onReceiverTap(
+                                    fireStoreController.users.value[index]);
+                              },
+                              title: Text(
+                                  fireStoreController.users.value[index].email),
+                              subtitle: Text(
+                                  "${fireStoreController.users.value[index].unReadMessages} Unread Messages"),
+                            );
                           },
                         ),
                       ),

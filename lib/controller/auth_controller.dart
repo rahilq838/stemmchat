@@ -30,11 +30,19 @@ class AuthController extends GetxController {
       );
       user =
           STEMMUser(uid: credential.user!.uid, email: credential.user!.email!);
+
       return credential.user;
     } catch (error) {
       // TODO: Implement error alert dialog if something goes wrong
+
+      Get.defaultDialog(
+          title: "Error",
+          middleText:
+              "This might occur because of\nWrong Email\n Wrong Password\nUser Does Not Exist");
+
       return null;
     }
+    return null;
   }
 
   //Register with email and password
@@ -50,8 +58,11 @@ class AuthController extends GetxController {
       await fireStoreController.createUserOnFireStore(user!);
       return credential.user;
     } catch (error) {
-      // TODO: Implement error alert dialog if something goes wrong
-      return null;
+        Get.defaultDialog(
+    title: "Error",
+    middleText:
+    "This might occur because of\nWrong Email\n Wrong Password\nUser Does Not Exist");
+        return null;
     }
   }
 

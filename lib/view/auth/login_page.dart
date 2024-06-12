@@ -38,8 +38,7 @@ class _LoginPageState extends State<LoginPage> {
          await authController.signInWithEmailAndPassword(
             emailController.text, passwordController.text);
          GetUtils.printFunction("login pressed","LoginPage","onLoginComplete");
-      } on FirebaseAuthException catch (e) {
-        // TODO: Implement error alert dialog if something goes wrong
+      } catch (e) {
         Get.defaultDialog(title: "ERROR", middleText: e.toString());
       }
 

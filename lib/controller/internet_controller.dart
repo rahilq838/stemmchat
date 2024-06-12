@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 class InternetController extends GetxController {
   RxBool isConnected = true.obs;
+  late final StreamSubscription<InternetStatus> listener;
 
   @override
   void onInit()async {
@@ -12,7 +15,7 @@ class InternetController extends GetxController {
 
   checkInternet() async {
     try {
-      final listener = InternetConnection().onStatusChange.listen((InternetStatus status) {
+      listener = InternetConnection().onStatusChange.listen((InternetStatus status) {
         switch (status) {
           case InternetStatus.connected:
           // The internet is now connected
@@ -28,5 +31,11 @@ class InternetController extends GetxController {
      catch(e) {
       isConnected.value = false;
     }
+  }
+
+  @override
+  void dispose() {
+    listener.cancel();
+    super.dispose();
   }
 }

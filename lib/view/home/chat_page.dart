@@ -36,6 +36,7 @@ class _ChatPageState extends State<ChatPage> {
       _chatController.sendMessage(
           _chatRoomController.currentReceiver!.uid,
           Message(
+              read: false,
               type: Message.textType,
               senderID: sender.uid,
               senderEmail: sender.email,
@@ -44,14 +45,10 @@ class _ChatPageState extends State<ChatPage> {
               timestamp: Timestamp.now()));
       messageController.clear();
     } catch (e) {
-      // Get.defaultDialog(
-      //   title: "Error",
-      //   middleText: e.toString(),
-      //   textConfirm: "Ok",
-      //   onConfirm: () {
-      //     Get.back();
-      //   },
-      // );
+      Get.defaultDialog(
+        title: "Error",
+        middleText: e.toString(),
+      );
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
     }
@@ -108,7 +105,8 @@ class _ChatPageState extends State<ChatPage> {
   onDownloadCancelPressed() {
     Get.back();
   }
-  onDownloadPressed(Message msg) async{
+
+  onDownloadPressed(Message msg) async {
     try {
       await fireBaseStorageController.downloadFile(msg);
     } catch (e) {
@@ -117,20 +115,20 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-
   onWillingToDownloadFile(Message message) {
     try {
       GetUtils.printFunction("onWillingToDownloadFile",
           "onWillingToDownloadFile", "onWillingToDownloadFile");
       Get.defaultDialog(title: "Download This ${message.body}?", actions: [
-        TextButton(onPressed: () async{
-          await onDownloadPressed(message);
-          Get.back();
-        }, child: const Text("Yes")),
+        TextButton(
+            onPressed: () async {
+              await onDownloadPressed(message);
+              Get.back();
+            },
+            child: const Text("Yes")),
         TextButton(onPressed: onDownloadCancelPressed, child: const Text("No"))
       ]);
     } catch (e) {
-
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
     }
@@ -165,61 +163,104 @@ class _ChatPageState extends State<ChatPage> {
                                     //     ? Text(_chatController
                                     //         .messages.value[index].body)
                                     //     :
-                                    Column(
+                                    Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: _chatController.messages
+                                  mainAxisAlignment: _chatController.messages
                                               .value[index].senderEmail ==
                                           sender.email
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.start,
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
                                   children: [
-                                    Text(
-                                        _chatController.messages.value[index]
-                                                    .senderEmail ==
-                                                sender.email
-                                            ? "You"
-                                            : _chatController.messages
-                                                .value[index].senderEmail
-                                                .split("@")[0],
-                                        style: getTextStyle(fc: focusColor)),
-                                    InkWell(
-                                      onTap: _chatController
-                                                  .messages.value[index].type ==
-                                              Message.textType
-                                          ? null
-                                          :(){onWillingToDownloadFile(_chatController
-                                          .messages.value[index]);} ,
-                                      child: Text(
-                                        _chatController
-                                            .messages.value[index].body,
-                                        style: _chatController.messages
-                                                    .value[index].type ==
-                                                Message.textType
-                                            ? getTextStyle(
-                                                fs: 16, fw: FontWeight.bold)
-                                            : getTextStyle(
-                                                fs: 16,
-                                                fc: Colors.blueAccent,
-                                                decor:
-                                                    TextDecoration.underline),
+                                    Flexible(
+                                      child: Card(
+                                        color: Colors.grey.shade200,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              if(_chatController
+                                                  .messages
+                                                  .value[index]
+                                                  .senderEmail !=
+                                                  sender.email && !_chatController
+                                                  .messages
+                                                  .value[index].read)
+                                                Text("New", style: getTextStyle(fs: 12)),
+                                              Text(
+                                                  _chatController
+                                                              .messages
+                                                              .value[index]
+                                                              .senderEmail ==
+                                                          sender.email
+                                                      ? "You"
+                                                      : _chatController
+                                                          .messages
+                                                          .value[index]
+                                                          .senderEmail
+                                                          .split("@")[0],
+                                                  style: getTextStyle(
+                                                      fc: focusColor)),
+                                              InkWell(
+                                                onTap: _chatController
+                                                            .messages
+                                                            .value[index]
+                                                            .type ==
+                                                        Message.textType
+                                                    ? null
+                                                    : () {
+                                                        onWillingToDownloadFile(
+                                                            _chatController
+                                                                .messages
+                                                                .value[index]);
+                                                      },
+                                                child: Text(
+                                                  _chatController.messages
+                                                      .value[index].body,
+                                                  style: _chatController
+                                                              .messages
+                                                              .value[index]
+                                                              .type ==
+                                                          Message.textType
+                                                      ? getTextStyle(
+                                                          fs: 16,
+                                                          fw: FontWeight.bold)
+                                                      : getTextStyle(
+                                                          fs: 16,
+                                                          fc: Colors.blueAccent,
+                                                          decor: TextDecoration
+                                                              .underline),
+                                                ),
+                                              ),
+                                              Text(
+                                                formatDate(_chatController
+                                                    .messages
+                                                    .value[index]
+                                                    .timestamp
+                                                    .millisecondsSinceEpoch),
+                                                style: getTextStyle(fs: 10),
+                                              ),
+                                              Text(
+                                                extractTime(_chatController
+                                                    .messages
+                                                    .value[index]
+                                                    .timestamp
+                                                    .millisecondsSinceEpoch),
+                                                style: getTextStyle(fs: 10),
+                                              ),
+                                              if(_chatController.messages
+                                                  .value[index].senderEmail ==
+                                                  sender.email)
+                                                Icon(
+                                                _chatController.messages.value[index].read?Icons.mark_chat_read_rounded:
+                                                Icons.mark_chat_unread_rounded,size: 13,),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      formatDate(_chatController
-                                          .messages
-                                          .value[index]
-                                          .timestamp
-                                          .millisecondsSinceEpoch),
-                                      style: getTextStyle(fs: 10),
-                                    ),
-                                    Text(
-                                      extractTime(_chatController
-                                          .messages
-                                          .value[index]
-                                          .timestamp
-                                          .millisecondsSinceEpoch),
-                                      style: getTextStyle(fs: 10),
-                                    )
                                   ],
                                 ),
                               )),
