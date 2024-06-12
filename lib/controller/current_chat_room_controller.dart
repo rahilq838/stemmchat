@@ -5,8 +5,6 @@ import '../model/chat_user.dart';
 
 class CurrentChatRoomController extends GetxController{
   ChatUser? currentReceiver;
-
-
   void setCurrentReceiver(ChatUser user){
     currentReceiver = user;
   }

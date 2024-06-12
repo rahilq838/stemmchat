@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:open_file_plus/open_file_plus.dart';
@@ -69,12 +70,12 @@ class FireBaseStorageController extends GetxController {
         String fileName = selectedFileController.file.value!.name;
         String chatRoomID = chatController
             .getCurrentChatRoom(chatRoomController.currentReceiver!.uid);
-        UploadTask uploadTask = FirebaseStorage.instance
+        uploadTask.value = FirebaseStorage.instance
             .ref('$chatRoomID/$timestamp$fileName')
             .putData(fileBytes!);
 
-        await uploadTask.whenComplete(()  async {
-        String downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
+        await uploadTask.value!.whenComplete(()  async {
+        String downloadUrl = await uploadTask.value!.snapshot.ref.getDownloadURL();
             String fileType =
             selectedFileController.file.value!.name.split(".").last;
 
@@ -172,4 +173,5 @@ class FireBaseStorageController extends GetxController {
 
     }
   }
+
 }

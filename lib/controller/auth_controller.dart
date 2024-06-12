@@ -7,7 +7,7 @@ import '../model/stemm_user.dart';
 
 class AuthController extends GetxController {
   @override
-  void onInit() {
+  void onInit() async{
     user = firebaseUser == null
         ? null
         : STEMMUser(uid: firebaseUser!.uid, email: firebaseUser!.email!);
@@ -28,8 +28,19 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
-      user =
-          STEMMUser(uid: credential.user!.uid, email: credential.user!.email!);
+
+      final data  = await fireStoreController.fsInstance
+          .collection("Users")
+          .doc(user?.uid)
+          .get();
+
+      user = STEMMUser.fromMap(data.data()!);
+
+      GetUtils.printFunction("user", user.toString(), "d");
+
+
+      // user =
+      //     STEMMUser(uid: credential.user!.uid, email: credential.user!.email!,profileUrl: );
 
       return credential.user;
     } catch (error) {
@@ -38,7 +49,7 @@ class AuthController extends GetxController {
       Get.defaultDialog(
           title: "Error",
           middleText:
-              "This might occur because of\nWrong Email\n Wrong Password\nUser Does Not Exist");
+              error.toString());
 
       return null;
     }
@@ -54,14 +65,15 @@ class AuthController extends GetxController {
         password: password,
       );
       user =
-          STEMMUser(uid: credential.user!.uid, email: credential.user!.email!);
+          STEMMUser(uid: credential.user!.uid, email: credential.user!.email!,profileUrl: null);
       await fireStoreController.createUserOnFireStore(user!);
+
       return credential.user;
     } catch (error) {
         Get.defaultDialog(
     title: "Error",
     middleText:
-    "This might occur because of\nWrong Email\n Wrong Password\nUser Does Not Exist");
+    error.toString());
         return null;
     }
   }

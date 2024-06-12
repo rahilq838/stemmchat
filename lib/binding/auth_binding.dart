@@ -11,8 +11,9 @@ class AuthBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => InternetController());
-    Get.lazyPut(() => FireStoreController(), fenix: true);
+    Get.lazyPut(() => FireStoreController());
     Get.put(AuthController(), permanent: true);
+    Get.lazyPut(()=>HomeController());
     Get.lazyPut(() => LoginOrRegisterController());
     Get.lazyPut(() => CurrentChatRoomController(), fenix: true) ;
   }

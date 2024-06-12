@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:stemmchat/controller/auth_controller.dart';
@@ -8,7 +10,7 @@ import 'firestore_controller.dart';
 class ChatController extends GetxController {
   int docLimit = 50;
   RxBool isLoading = false.obs;
-  final fsInstance = Get.find<FireStoreController>().fsInstance;
+  final fsInstance = FirebaseFirestore.instance;
   final authController = Get.find<AuthController>();
   final currentChatRoomController = Get.find<CurrentChatRoomController>();
   Rx<List<Message>> messages = Rx<List<Message>>([]);
@@ -19,30 +21,30 @@ class ChatController extends GetxController {
     isLoading.value = true;
     await getMessages(currentChatRoomController.currentReceiver!.uid);
     isLoading.value = false;
-    await markAsReadWhenChatPageOpens();
+    // await markAsReadWhenChatPageOpens();
     super.onInit();
   }
 
-  markAsReadWhenChatPageOpens() async {
-    try {
-      if (authController.user != null) {
-        await fsInstance
-            .collection("chat_rooms")
-            .doc(getCurrentChatRoom(
-                currentChatRoomController.currentReceiver!.uid))
-            .collection("Messages")
-            .where("senderID",
-                isEqualTo: currentChatRoomController.currentReceiver!.uid)
-            .get()
-            .then((value) {
-          value.docs.map((e) => e.reference.update({"read": true}));
-        });
-      }
-    } catch (e) {
-      GetUtils.printFunction(e.toString(), "ChatController", "markAsRead",
-          isError: true);
-    }
-  }
+  // markAsReadWhenChatPageOpens() async {
+  //   try {
+  //     if (authController.user != null) {
+  //       await fsInstance
+  //           .collection("chat_rooms")
+  //           .doc(getCurrentChatRoom(
+  //               currentChatRoomController.currentReceiver!.uid))
+  //           .collection("Messages")
+  //           .where("senderID",
+  //               isEqualTo: currentChatRoomController.currentReceiver!.uid)
+  //           .get()
+  //           .then((value) {
+  //         value.docs.map((e) => e.reference.update({"read": true}));
+  //       });
+  //     }
+  //   } catch (e) {
+  //     GetUtils.printFunction(e.toString(), "ChatController", "markAsRead",
+  //         isError: true);
+  //   }
+  // }
 
   String getCurrentChatRoom(String receiverID) {
     List<String> ids = [authController.user!.uid, receiverID];

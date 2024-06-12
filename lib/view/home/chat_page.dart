@@ -148,8 +148,9 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(
                 flex: 5,
-                child: Obx(
-                  () => _chatController.isLoading.value
+                child: GetX(
+                  init: fireBaseStorageController,
+                  builder: (_) => _chatController.isLoading.value
                       ? const Center(child: CircularProgressIndicator())
                       : ListView.builder(
                           reverse: true,
@@ -181,14 +182,15 @@ class _ChatPageState extends State<ChatPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              if(_chatController
-                                                  .messages
-                                                  .value[index]
-                                                  .senderEmail !=
-                                                  sender.email && !_chatController
-                                                  .messages
-                                                  .value[index].read)
-                                                Text("New", style: getTextStyle(fs: 12)),
+                                              // TODO: Implement new msg indicator
+                                              // if(_chatController
+                                              //     .messages
+                                              //     .value[index]
+                                              //     .senderEmail !=
+                                              //     sender.email && !_chatController
+                                              //     .messages
+                                              //     .value[index].read)
+                                              //   Text("New", style: getTextStyle(fs: 12)),
                                               Text(
                                                   _chatController
                                                               .messages

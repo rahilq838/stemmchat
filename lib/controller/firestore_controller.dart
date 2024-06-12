@@ -2,43 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:stemmchat/model/stemm_user.dart';
-import '../model/chat_user.dart';
-
 class FireStoreController extends GetxController {
-
-  @override
-  void onInit() async{
-   await getUsers();
-    super.onInit();
-  }
-
-  FirebaseFirestore fsInstance = FirebaseFirestore.instance;
-  final User? user = FirebaseAuth.instance.currentUser;
-  Rx<List<ChatUser>> users = Rx<List<ChatUser>>([]);
+  final fsInstance = FirebaseFirestore.instance;
 
 
   Future<void> createUserOnFireStore(STEMMUser user) async {
-    await fsInstance.collection("Users").add(user.toMap());
+    await fsInstance.collection("Users").doc(user.uid).set(user.toMap());
   }
 
 
-  getUsers() async {
-    if (user != null) {
-      try {
-        GetUtils.printFunction("getUsers", "HomeController", "getUsers");
-        fsInstance.collection("Users").snapshots().listen((event) {
-          users.value = event.docs
-              .map((e) => ChatUser.fromMap(e.data()))
-              .toList()
-              .where((element) => element.uid != user?.uid)
-              .toList();
-        });
-      } catch (e) {
-        GetUtils.printFunction(e.toString(), "FireStoreController", "getUsers");
-      }
-    }
-  }
 
+
+  // TODO: get all unread messages count for each user
   // Future<int> getUnreadMessagesCountForReceiver(currentUserID) async {
   //   try {
   //     GetUtils.printFunction("getUnreadMessagesCountForReceiver", "HomeController", "getUnreadMessagesCountForReceiver");
