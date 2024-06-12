@@ -2,12 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stemmchat/controller/firestore_controller.dart';
+import 'package:stemmchat/controller/home_controller.dart';
 
 import '../model/stemm_user.dart';
 
 class AuthController extends GetxController {
   @override
   void onInit() async{
+
     user.value = firebaseUser == null
         ? null
         : STEMMUser(uid: firebaseUser!.uid, email: firebaseUser!.email!);
@@ -23,7 +25,7 @@ class AuthController extends GetxController {
 
     super.onInit();
   }
-
+  final homeController = Get.lazyPut(() => HomeController());
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final User? firebaseUser = FirebaseAuth.instance.currentUser;
   Stream<User?> get userStream => _auth.authStateChanges();
@@ -32,8 +34,10 @@ class AuthController extends GetxController {
 
   //Sign in with email and password
   Future<User?> signInWithEmailAndPassword(
+
       String email, String password) async {
     try {
+      Get.lazyPut(()=>HomeController());
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -90,6 +94,7 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     try {
       user.value  = null;
+      Get.delete<HomeController>();
       await _auth.signOut();
     } catch (error) {
       // TODO: Implement error alert dialog if something goes wrong

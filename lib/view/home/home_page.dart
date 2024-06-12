@@ -26,6 +26,7 @@ class HomePage extends StatelessWidget {
       GetUtils.printFunction(
           "sign out pressed", "HomePage", "onSignOutPressed");
       _authController.signOut();
+      homeController.users.value.clear();
     } catch (error) {
       // TODO: Implement error alert dialog if something goes wrong
       Get.defaultDialog(title: "ERROR", middleText: error.toString());

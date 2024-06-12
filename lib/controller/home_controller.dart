@@ -20,7 +20,7 @@ class HomeController extends GetxController {
   @override
   void onInit() async {
     GetUtils.printFunction("HomeController", "onInit", "onInit");
-    getUsers();
+    await getUsers();
     super.onInit();
   }
 
