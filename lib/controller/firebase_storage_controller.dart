@@ -84,8 +84,8 @@ class FireBaseStorageController extends GetxController {
             Message(
               read: false,
                 type: fileType,
-                senderID: chatController.authController.user!.uid,
-                senderEmail: chatController.authController.user!.email,
+                senderID: chatController.authController.user.value !.uid,
+                senderEmail: chatController.authController.user.value !.email,
                 receiverID: chatRoomController.currentReceiver!.uid,
                 downloadUrl: downloadUrl,
                 timestamp: timestamp, body: fileName));

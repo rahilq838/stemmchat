@@ -26,7 +26,7 @@ class _ChatPageState extends State<ChatPage> {
   final _chatController = Get.find<ChatController>();
   final FireBaseStorageController fireBaseStorageController =
       Get.find<FireBaseStorageController>();
-  final STEMMUser sender = Get.find<AuthController>().user!;
+  final STEMMUser sender = Get.find<AuthController>().user.value !;
   final currentFileController = Get.find<SelectedFileController>();
 
   onSendPressed() {

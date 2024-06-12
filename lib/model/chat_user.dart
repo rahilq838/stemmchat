@@ -1,24 +1,24 @@
 class ChatUser{
   String uid;
   String email;
-  String? unReadMessages = "0";
-  ChatUser({required this.uid, required this.email, this.unReadMessages});
+  String? profileUrl;
+  ChatUser({required this.uid, required this.email, this.profileUrl});
 
   factory ChatUser.fromMap(Map<String, dynamic> map) {
-    return ChatUser(uid:map['uid'], email:  map['email'], unReadMessages: map['unReadMessages']);
+    return ChatUser(uid:map['uid'], email:  map['email'], profileUrl: map['profileUrl']);
   }
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'email': email,
-      'unReadMessages': unReadMessages,
+      'profileUrl': profileUrl,
     };
   }
 
   @override
   String toString() {
-    return 'User{uid: $uid, email: $email, unReadMessages: $unReadMessages}';
+    return 'User{uid: $uid, email: $email, unReadMessages: $profileUrl}';
   }
 
 }

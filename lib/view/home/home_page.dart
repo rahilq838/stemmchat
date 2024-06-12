@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:stemmchat/controller/current_chat_room_controller.dart';
 import 'package:stemmchat/controller/firebase_storage_controller.dart';
 import 'package:stemmchat/controller/firestore_controller.dart';
+import 'package:stemmchat/model/stemm_user.dart';
 import 'package:stemmchat/route.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
@@ -30,7 +32,7 @@ class HomePage extends StatelessWidget {
     }
   }
 
-  onReceiverTap(ChatUser receiver) {
+  onReceiverTap(STEMMUser receiver) {
     GetUtils.printFunction("onReceiverTap", "HomePage", "onReceiverTap");
     _currentChatRoomController.currentReceiver = receiver;
     Get.toNamed(chatPageRoute);
@@ -55,15 +57,17 @@ class HomePage extends StatelessWidget {
         content: SingleChildScrollView(
           child: Column(
             children: [
-              CircleAvatar(
-                  maxRadius: 50,
-                  child: _authController.user?.profileUrl == null
-                      ? const Icon(
-                          Icons.person,
-                          size: 50,
-                        )
-                      : Image.network(_authController.user?.profileUrl ?? "")),
-              Text("${_authController.user?.email}"),
+              Obx(
+                () => CircleAvatar(
+                    maxRadius: 50,
+                    child: _authController.user.value ?.profileUrl == null
+                        ? const Icon(
+                            Icons.person,
+                            size: 50,
+                          )
+                        : Image.network(_authController.user.value ?.profileUrl ?? "")),
+              ),
+              Text("${_authController.user.value ?.email}"),
               TextButton(
                   onPressed: onUpdateProfilePicPressed,
                   child: const Text("Update Profile Picture"))
@@ -104,10 +108,12 @@ class HomePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text("Hi,\n${_authController.user?.email}",
-                    style: getTextStyle(
-                      fs: 16,
-                    )),
+                Obx(()=>
+                   Text("Hi,\n${_authController.user.value ?.email}",
+                      style: getTextStyle(
+                        fs: 16,
+                      )),
+                ),
                 Padding(
                   padding: getLRTBPadding(left: 2.0, right: 2.0),
                   child: Card(
@@ -127,7 +133,12 @@ class HomePage extends StatelessWidget {
                                 },
                                 title: Text(
                                     homeController.users.value[index].email),
-                                leading: _authController.user?.profileUrl==null?const Icon(Icons.person):Image.network(_authController.user!.profileUrl!), // Icon(Icons.person),
+                                leading:
+                                    homeController.users.value[index].profileUrl == null?
+                                    const Icon(Icons.person):
+                                Image.network(homeController.users.value[index].profileUrl ?? ""),
+
+                                         // Icon(Icons.person),
                                 trailing: const Icon(Icons.chat)
                                 // subtitle: Text(
                                 //     "${fireStoreController.users.value[index].unReadMessages} Unread Messages"),

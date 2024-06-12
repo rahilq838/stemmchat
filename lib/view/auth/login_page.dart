@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void onLogin() async {
+  onLogin() async {
     if (_loginFormKey.currentState!.validate()) {
       GetUtils.printFunction("login pressed","LoginPage","onLogin");
       try {
@@ -116,7 +116,9 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Expanded(
                             child: ElevatedButton(
-                          onPressed: onLogin,
+                          onPressed:()async{
+                            await onLogin();
+                          } ,
                           style: getElevatedButtonStyle(),
                           child: Padding(
                             padding: getLRTBPadding(),

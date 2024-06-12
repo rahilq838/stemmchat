@@ -47,7 +47,7 @@ class ChatController extends GetxController {
   // }
 
   String getCurrentChatRoom(String receiverID) {
-    List<String> ids = [authController.user!.uid, receiverID];
+    List<String> ids = [authController.user.value !.uid, receiverID];
     ids.sort();
     String currentChatRoom = ids.join("_");
     return currentChatRoom;

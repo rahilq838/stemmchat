@@ -8,16 +8,26 @@ import '../model/stemm_user.dart';
 class AuthController extends GetxController {
   @override
   void onInit() async{
-    user = firebaseUser == null
+    user.value = firebaseUser == null
         ? null
         : STEMMUser(uid: firebaseUser!.uid, email: firebaseUser!.email!);
+
+    if(firebaseUser != null){
+      final data = await fireStoreController.fsInstance
+          .collection("Users")
+          .doc(firebaseUser!.uid)
+          .get();
+      user.value  = STEMMUser.fromMap(data.data()!);
+    }
+
+
     super.onInit();
   }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final User? firebaseUser = FirebaseAuth.instance.currentUser;
   Stream<User?> get userStream => _auth.authStateChanges();
-  STEMMUser? user;
+  Rx<STEMMUser?> user = Rx<STEMMUser?>(null);
   FireStoreController fireStoreController = Get.find<FireStoreController>();
 
   //Sign in with email and password
@@ -28,14 +38,12 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
-
       final data  = await fireStoreController.fsInstance
           .collection("Users")
-          .doc(user?.uid)
+          .doc(credential.user?.uid)
           .get();
 
-      user = STEMMUser.fromMap(data.data()!);
-
+      user.value  = STEMMUser.fromMap( data.data()!);
       GetUtils.printFunction("user", user.toString(), "d");
 
 
@@ -64,9 +72,9 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
-      user =
+      user.value  =
           STEMMUser(uid: credential.user!.uid, email: credential.user!.email!,profileUrl: null);
-      await fireStoreController.createUserOnFireStore(user!);
+      await fireStoreController.createUserOnFireStore(user.value !);
 
       return credential.user;
     } catch (error) {
@@ -81,6 +89,7 @@ class AuthController extends GetxController {
   //Sign out
   Future<void> signOut() async {
     try {
+      user.value  = null;
       await _auth.signOut();
     } catch (error) {
       // TODO: Implement error alert dialog if something goes wrong
