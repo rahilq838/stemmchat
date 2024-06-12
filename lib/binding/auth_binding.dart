@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:stemmchat/controller/firestore_controller.dart';
+import 'package:stemmchat/controller/internet_controller.dart';
 import 'package:stemmchat/controller/login_or_register_controller.dart';
 import 'package:stemmchat/view/auth/login_or_register.dart';
 
@@ -14,5 +15,6 @@ class AuthBinding extends Bindings {
     Get.put(AuthController(), permanent: true);
     Get.lazyPut(() => LoginOrRegisterController());
     Get.lazyPut(() => CurrentChatRoomController(), fenix: true) ;
+    Get.lazyPut(() => InternetController());
   }
 }

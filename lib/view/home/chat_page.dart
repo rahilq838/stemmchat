@@ -44,16 +44,33 @@ class _ChatPageState extends State<ChatPage> {
               timestamp: Timestamp.now()));
       messageController.clear();
     } catch (e) {
+      // Get.defaultDialog(
+      //   title: "Error",
+      //   middleText: e.toString(),
+      //   textConfirm: "Ok",
+      //   onConfirm: () {
+      //     Get.back();
+      //   },
+      // );
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
     }
   }
 
-  onSendFilePressed() {
+  onSendFilePressed() async {
     try {
-      GetUtils.printFunction("onSendPressed", "onSendPressed", "onSendPressed");
-    }
-     catch (e) {
+      await fireBaseStorageController.uploadFile();
+      // Get.defaultDialog(
+      //   title: "File Sent",
+      //   middleText: "File Sent Successfully",
+      //   textConfirm: "Ok",
+      //   onConfirm: () {
+      //     Get.back();
+      //   },
+      // );
+      GetUtils.printFunction(
+          "onSendFilePressed", "onSendFilePressed", "onSendFilePressed");
+    } catch (e) {
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
     }
@@ -64,7 +81,6 @@ class _ChatPageState extends State<ChatPage> {
       fireBaseStorageController.openImagePicker();
       GetUtils.printFunction("onUploadPressed",
           "_chatRoomController.currentReceiver!.uid", "onUploadPressed");
-
     } catch (e) {
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
@@ -75,6 +91,46 @@ class _ChatPageState extends State<ChatPage> {
     try {
       currentFileController.setSelectedFile(null);
     } catch (e) {
+      GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
+          isError: true);
+    }
+  }
+
+  onUploadTaskCancelPressed() {
+    try {
+      fireBaseStorageController.uploadTask.value?.cancel();
+    } catch (e) {
+      GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
+          isError: true);
+    }
+  }
+
+  onDownloadCancelPressed() {
+    Get.back();
+  }
+  onDownloadPressed(Message msg) async{
+    try {
+      await fireBaseStorageController.downloadFile(msg);
+    } catch (e) {
+      GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
+          isError: true);
+    }
+  }
+
+
+  onWillingToDownloadFile(Message message) {
+    try {
+      GetUtils.printFunction("onWillingToDownloadFile",
+          "onWillingToDownloadFile", "onWillingToDownloadFile");
+      Get.defaultDialog(title: "Download This ${message.body}?", actions: [
+        TextButton(onPressed: () async{
+          await onDownloadPressed(message);
+          Get.back();
+        }, child: const Text("Yes")),
+        TextButton(onPressed: onDownloadCancelPressed, child: const Text("No"))
+      ]);
+    } catch (e) {
+
       GetUtils.printFunction(e.toString(), "ChatPage", "onSendPressed",
           isError: true);
     }
@@ -102,9 +158,20 @@ class _ChatPageState extends State<ChatPage> {
                           itemCount: _chatController.messages.value.length,
                           itemBuilder: (context, index) => Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Column(
+                                child:
+                                    // _chatController
+                                    //             .messages.value[index].type !=
+                                    //         Message.textType
+                                    //     ? Text(_chatController
+                                    //         .messages.value[index].body)
+                                    //     :
+                                    Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: _chatController.messages
+                                              .value[index].senderEmail ==
+                                          sender.email
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                         _chatController.messages.value[index]
@@ -115,11 +182,28 @@ class _ChatPageState extends State<ChatPage> {
                                                 .value[index].senderEmail
                                                 .split("@")[0],
                                         style: getTextStyle(fc: focusColor)),
-                                    Text(
+                                    InkWell(
+                                      onTap: _chatController
+                                                  .messages.value[index].type ==
+                                              Message.textType
+                                          ? null
+                                          :(){onWillingToDownloadFile(_chatController
+                                          .messages.value[index]);} ,
+                                      child: Text(
                                         _chatController
                                             .messages.value[index].body,
-                                        style: getTextStyle(
-                                            fs: 16, fw: FontWeight.bold)),
+                                        style: _chatController.messages
+                                                    .value[index].type ==
+                                                Message.textType
+                                            ? getTextStyle(
+                                                fs: 16, fw: FontWeight.bold)
+                                            : getTextStyle(
+                                                fs: 16,
+                                                fc: Colors.blueAccent,
+                                                decor:
+                                                    TextDecoration.underline),
+                                      ),
+                                    ),
                                     Text(
                                       formatDate(_chatController
                                           .messages
@@ -146,16 +230,16 @@ class _ChatPageState extends State<ChatPage> {
               child: Obx(
                 () => currentFileController.file.value == null
                     ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.attach_file,
-                            color: focusColor,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.attach_file,
+                              color: focusColor,
+                            ),
+                            onPressed: onUploadFilePressed,
                           ),
-                          onPressed: onUploadFilePressed,
-                        ),
-                        TextFormField(
+                          TextFormField(
                             controller: messageController,
                             validator: fieldValidator,
                             decoration: getInputDecoration(
@@ -167,26 +251,37 @@ class _ChatPageState extends State<ChatPage> {
                                       color: focusColor,
                                     ))),
                           ),
-                      ],
-                    )
+                        ],
+                      )
                     : Row(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Flexible(child: Text(currentFileController.file.value!.name)),
+                          !fireBaseStorageController.isUploading.value
+                              ? Flexible(
+                                  child: Text(
+                                      currentFileController.file.value!.name))
+                              : const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                           IconButton(
                             icon: const Icon(
                               Icons.cancel,
                               color: focusColor,
                             ),
-                            onPressed: onUploadCancelPressed,
+                            onPressed:
+                                fireBaseStorageController.isUploading.value
+                                    ? onUploadCancelPressed
+                                    : onUploadTaskCancelPressed,
                           ),
                           IconButton(
                             icon: const Icon(
                               Icons.send,
                               color: focusColor,
                             ),
-                            onPressed: onSendFilePressed,
+                            onPressed: () async {
+                              await onSendFilePressed();
+                            },
                           ),
                         ],
                       ),
